@@ -29,3 +29,33 @@
  }
  const counts=document.querySelectorAll('.count');function animateCount(el){if(el.dataset.done==='1')return;el.dataset.done='1';const n=+el.dataset.n;if(reduce){el.textContent=n;return}const t=performance.now();(function tick(now){const p=Math.min((now-t)/1100,1),v=Math.floor((1-Math.pow(1-p,3))*n);el.textContent=v;if(p<1)requestAnimationFrame(tick)})(t)};const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){animateCount(e.target);obs.unobserve(e.target)}}),{threshold:.1,rootMargin:'0px 0px -10% 0px'});counts.forEach(c=>obs.observe(c));setTimeout(()=>counts.forEach(animateCount),1500);
 })();
+
+/* Cinematic interaction layer */
+(function(){
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sections=[...document.querySelectorAll('main section[id]')];
+  const navLinks=[...document.querySelectorAll('.nav nav a')];
+  if('IntersectionObserver' in window){
+    const io=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting)return;
+        navLinks.forEach(a=>a.classList.toggle('is-active',a.getAttribute('href')==='#'+entry.target.id));
+      });
+    },{rootMargin:'-35% 0px -55% 0px',threshold:0});
+    sections.forEach(s=>io.observe(s));
+  }
+  if(!reduce){
+    document.querySelectorAll('.work-card,.exp-card,.research-list article').forEach(el=>{
+      el.addEventListener('mousemove',e=>{
+        const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+        el.style.transform='perspective(1000px) rotateX('+(-y*2.2)+'deg) rotateY('+(x*2.2)+'deg) translateY(-4px)';
+      });
+      el.addEventListener('mouseleave',()=>el.style.transform='');
+    });
+    const hero=document.querySelector('.hero');
+    window.addEventListener('scroll',()=>{
+      const p=Math.min(scrollY/Math.max(hero.offsetHeight,1),1);
+      hero.style.setProperty('--scroll-fade',p);
+    },{passive:true});
+  }
+})();
