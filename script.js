@@ -27,5 +27,5 @@
  }else{
    document.querySelectorAll('.reveal-text').forEach(el=>el.style.clipPath='inset(0)');
  }
- const counts=document.querySelectorAll('.count');const obs=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,n=+el.dataset.n;if(reduce){el.textContent=n;obs.unobserve(el);return}const t=performance.now();(function tick(now){const p=Math.min((now-t)/1100,1),v=Math.floor((1-Math.pow(1-p,3))*n);el.textContent=v;if(p<1)requestAnimationFrame(tick)})(t);obs.unobserve(el)}),{threshold:.5});counts.forEach(c=>obs.observe(c));
+ const counts=document.querySelectorAll('.count');function animateCount(el){if(el.dataset.done==='1')return;el.dataset.done='1';const n=+el.dataset.n;if(reduce){el.textContent=n;return}const t=performance.now();(function tick(now){const p=Math.min((now-t)/1100,1),v=Math.floor((1-Math.pow(1-p,3))*n);el.textContent=v;if(p<1)requestAnimationFrame(tick)})(t)};const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){animateCount(e.target);obs.unobserve(e.target)}}),{threshold:.1,rootMargin:'0px 0px -10% 0px'});counts.forEach(c=>obs.observe(c));setTimeout(()=>counts.forEach(animateCount),1500);
 })();
